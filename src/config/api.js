@@ -1,13 +1,13 @@
 // API Configuration with Environment Variable Priority
-// Priority: Netlify env vars → .env file → localhost fallback
+// Priority: Environment variables → localhost fallback
 
 const getApiBaseUrl = () => {
-  // 1st Priority: Environment variables (Netlify deployment)
+  // Production: Use environment variable from Netlify
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
 
-  // 2nd Priority: Fallback to localhost for development
+  // Development: Default to localhost
   return "http://localhost:8080";
 };
 
@@ -15,7 +15,6 @@ export const API_BASE_URL = getApiBaseUrl();
 
 // Helper function to construct full API endpoints
 export const getApiEndpoint = (path) => {
-  // Remove leading slash if present to avoid double slashes
   const cleanPath = path.startsWith("/") ? path.slice(1) : path;
   return `${API_BASE_URL}/${cleanPath}`;
 };
@@ -66,9 +65,10 @@ export const API_ENDPOINTS = {
   ADMIN_NEWS_ALL: getApiEndpoint("admin/news/all"),
 };
 
-// Debug function (remove in production)
+// Environment info
 console.log("API Configuration:", {
   baseUrl: API_BASE_URL,
   environment: import.meta.env.MODE,
-  hasEnvVar: !!import.meta.env.VITE_API_URL,
+  isDevelopment: import.meta.env.DEV,
+  isProduction: import.meta.env.PROD,
 });
