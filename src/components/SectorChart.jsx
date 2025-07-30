@@ -1,8 +1,18 @@
 import React from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { motion } from "framer-motion";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
+
+const chartVariants = {
+  hidden: { opacity: 0, scale: 0.8 },
+  visible: { 
+    opacity: 1, 
+    scale: 1,
+    transition: { duration: 0.6, ease: "easeOut" }
+  }
+}
 
 const SectorChart = ({ holdings }) => {
   const sectorTotals = {};
@@ -36,10 +46,18 @@ const SectorChart = ({ holdings }) => {
   };
 
   return (
-    <div style={{ maxWidth: "500px", margin: "20px auto" }}>
-      <h3 style={{ textAlign: "center" }}>Sector-wise Investment</h3>
-      <Pie data={data} />
-    </div>
+    <motion.div 
+      className="card p-4 mb-4 shadow-sm mx-auto" // Bootstrap card classes, centering
+      style={{ maxWidth: "500px" }} // Keep max-width for chart container
+      variants={chartVariants}
+      initial="hidden"
+      animate="visible"
+    >
+      <h3 className="card-title text-center mb-3">Sector-wise Investment</h3> {/* Bootstrap card title, text-center, margin-bottom */}
+      <div className="chart-container"> {/* Responsive container for chart */}
+        <Pie data={data} />
+      </div>
+    </motion.div>
   );
 };
 

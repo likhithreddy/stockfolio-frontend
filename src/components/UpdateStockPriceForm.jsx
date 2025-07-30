@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion"; // Removed useScroll, useTransform
 import { API_ENDPOINTS } from "../config/api";
+
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const fieldVariants = {
+  focus: { scale: 1.02, borderColor: "#2575fc" },
+};
 
 const UpdateStockPriceForm = () => {
   const [form, setForm] = useState({
@@ -73,27 +83,41 @@ const UpdateStockPriceForm = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "auto" }}>
-      <h2>Update Stock Price History</h2>
-      {Object.entries(form).map(([key, value]) => (
-        <div key={key}>
-          <label>{key.replace(/_/g, " ")}</label>
-          <input
-            type={["stock_id", "volume"].includes(key) ? "number" : "text"}
-            name={key}
-            value={value}
-            onChange={handleChange}
-            style={{ width: "100%", marginBottom: "10px", padding: "8px" }}
-          />
-        </div>
-      ))}
-      {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
-      )}
-      <button onClick={submit} style={{ padding: "10px 20px" }}>
-        Submit
-      </button>
-    </div>
+    <motion.div
+      className="container mt-5" // Bootstrap container
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+    >
+      <div className="card p-4 shadow-lg mx-auto" style={{ maxWidth: "400px" }}> {/* Bootstrap card and centering */}
+        <h2 className="text-center mb-4">Update Stock Price History</h2>
+        {Object.entries(form).map(([key, value]) => (
+          <div className="mb-3" key={key}> {/* Bootstrap margin-bottom */}
+            <label className="form-label">{key.replace(/_/g, " ")}</label>
+            <motion.input
+              type={["stock_id", "volume"].includes(key) ? "number" : "text"}
+              name={key}
+              value={value}
+              onChange={handleChange}
+              className="form-control" // Bootstrap form control
+              whileFocus="focus"
+              variants={fieldVariants}
+            />
+          </div>
+        ))}
+        {error && (
+          <div className="alert alert-danger text-center">{error}</div> // Bootstrap alert for errors
+        )}
+        <motion.button
+          onClick={submit}
+          className="btn btn-primary w-100 mt-3" // Bootstrap button classes
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Submit
+        </motion.button>
+      </div>
+    </motion.div>
   );
 };
 

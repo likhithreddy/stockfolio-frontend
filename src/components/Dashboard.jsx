@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import SectorChart from "./SectorChart";
 import AddGoalForm from "./AddGoalForm";
 import EditableGoalCard from "./EditableGoalCard";
@@ -8,6 +9,7 @@ import AvailableStockList from "./AvailableStockList";
 import AddPortfolioForm from "./AddPortfolioForm";
 import NewsFeed from "./NewsFeed";
 import { API_ENDPOINTS } from "../config/api";
+import { staggerContainer, fadeInUp } from "../animations/variants";
 
 import axios from "axios";
 
@@ -23,47 +25,52 @@ const DashboardPage = () => {
       setData(response.data);
     };
     loadDashboard();
-  }, []);
+  }, [userId]);
 
-  if (!data) return <p style={{ padding: "30px" }}>Loading...</p>;
+  if (!data) return <p className="text-center mt-5">Loading...</p>;
 
   const { userInfo, preferences, goals, portfolios, holdings, watchlist } =
     data;
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.heading}>Investor Dashboard</h1>
+    <motion.div
+      className="container mt-4" // Bootstrap container with margin-top
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+    >
+      <motion.h1 className="text-center mb-4" variants={fadeInUp}>Investor Dashboard</motion.h1>
       {/*Profile Section */}
-      <section style={styles.card}>
-        <h2>
-          Welcome, {userInfo.firstname} {userInfo.lastname}
-        </h2>
-        <p>Email: {userInfo.email}</p>
-        <p>
+      <motion.section className="card p-4 mb-4 shadow-sm" variants={fadeInUp}>
+        <h2 className="card-title">Welcome, {userInfo.firstname} {userInfo.lastname}</h2>
+        <p className="card-text">Email: {userInfo.email}</p>
+        <p className="card-text">
           KYC Status:{" "}
-          <span style={styles.kyc(userInfo.is_kyc_done)}>
+          <span className={`badge bg-${userInfo.is_kyc_done ? "success" : "warning"}`}> {/* Bootstrap badge for status */}
             {userInfo.is_kyc_done ? "Done" : "Pending"}
           </span>
         </p>
-      </section>
+      </motion.section>
       {/*Preferences */}
-      <section style={styles.card}>
-        <h2>Preferences</h2>
-        <p>Preferred Sector: {preferences?.preferred_sector || "N/A"}</p>
-        <p>Risk Level: {preferences?.preferred_risk_level || "N/A"}</p>
-        <p>
+      <motion.section className="card p-4 mb-4 shadow-sm" variants={fadeInUp}>
+        <h2 className="card-title">Preferences</h2>
+        <p className="card-text">Preferred Sector: {preferences?.preferred_sector || "N/A"}</p>
+        <p className="card-text">Risk Level: {preferences?.preferred_risk_level || "N/A"}</p>
+        <p className="card-text">
           Notifications:{" "}
-          {preferences?.notification_enabled ? "Enabled" : "Disabled"}
+          <span className={`badge bg-${preferences?.notification_enabled ? "success" : "danger"}`}> {/* Bootstrap badge for status */}
+            {preferences?.notification_enabled ? "Enabled" : "Disabled"}
+          </span>
         </p>
         <PreferencesForm
           current={preferences}
           onUpdate={() => window.location.reload()}
         />
-      </section>
+      </motion.section>
 
       {/*Goals */}
-      <section style={styles.card}>
-        <h2>Investment Goals</h2>
+      <motion.section className="card p-4 mb-4 shadow-sm" variants={fadeInUp}>
+        <h2 className="card-title">Investment Goals</h2>
         {goals?.map((goal) => (
           <EditableGoalCard
             key={goal.goal_id}
@@ -72,18 +79,20 @@ const DashboardPage = () => {
           />
         ))}
         <AddGoalForm onGoalAdded={() => window.location.reload()} />
-      </section>
+      </motion.section>
 
-      <section style={styles.card}>
-        <h2>Watchlist</h2>
+      <motion.section className="card p-4 mb-4 shadow-sm" variants={fadeInUp}>
+        <h2 className="card-title">Watchlist</h2>
         {watchlist?.length ? (
-          <ul>
+          <ul className="list-group list-group-flush">
             {watchlist.map((stock) => (
-              <li key={stock.stock_id}>
-                <strong>{stock.symbol}</strong> – {stock.company_name} ($
-                {stock.current_value})
-                <button
-                  style={styles.removeBtn}
+              <motion.li key={stock.stock_id} variants={fadeInUp} layout className="list-group-item d-flex justify-content-between align-items-center">
+                <span>
+                  <strong>{stock.symbol}</strong> – {stock.company_name} ($
+                  {stock.current_value})
+                </span>
+                <motion.button
+                  className="btn btn-sm btn-danger ms-2" // Bootstrap button classes
                   onClick={async () => {
                     try {
                       await axios.post(API_ENDPOINTS.WATCHLIST_REMOVE, {
@@ -95,37 +104,39 @@ const DashboardPage = () => {
                       alert("Failed to remove");
                     }
                   }}
+                  whileHover={{ scale: 1.1, backgroundColor: "#c0392b" }}
+                  whileTap={{ scale: 0.9 }}
                 >
                   Remove
-                </button>
+                </motion.button>
                 <TradeStockForm
                   stockId={stock.stock_id}
                   symbol={stock.symbol}
                   portfolios={portfolios}
                   onTrade={() => window.location.reload()}
                 />
-              </li>
+              </motion.li>
             ))}
           </ul>
         ) : (
-          <p>No stocks in watchlist.</p>
+          <p className="text-muted">No stocks in watchlist.</p>
         )}
-      </section>
+      </motion.section>
 
       {/*Portfolios */}
-      <section style={styles.card}>
-        <h2>Portfolios</h2>
+      <motion.section className="card p-4 mb-4 shadow-sm" variants={fadeInUp}>
+        <h2 className="card-title">Portfolios</h2>
         <AddPortfolioForm onAdded={() => window.location.reload()} />
 
         {portfolios?.map((p) => (
-          <div key={p.portfolio_id} style={styles.subCard}>
+          <motion.div key={p.portfolio_id} className="card p-3 mt-3 border-primary" variants={fadeInUp} layout>
             <strong>{p.portfolio_name}</strong> (ID: {p.portfolio_id}) –
             Created: {new Date(p.created_date).toDateString()}
-            <ul>
+            <ul className="list-group list-group-flush mt-2">
               {holdings
                 .filter((h) => h.portfolio_id === p.portfolio_id)
                 .map((h) => (
-                  <li key={h.stock_id}>
+                  <li key={h.stock_id} className="list-group-item">
                     {h.symbol} – {h.company_name}
                     <br />
                     Shares: {h.shares_owned}, Avg Price: $
@@ -134,59 +145,15 @@ const DashboardPage = () => {
                   </li>
                 ))}
             </ul>
-          </div>
+          </motion.div>
         ))}
-      </section>
-      {console.log(holdings)}
+      </motion.section>
       {/*Sector Breakdown */}
       {holdings?.length > 0 && <SectorChart holdings={holdings} />}
       <AvailableStockList onAdded={() => window.location.reload()} />
       <NewsFeed userId={userId} />
-    </div>
+    </motion.div>
   );
-};
-
-const styles = {
-  removeBtn: {
-    marginLeft: "10px",
-    background: "#e74c3c",
-    color: "white",
-    border: "none",
-    padding: "5px 10px",
-    borderRadius: "6px",
-    cursor: "pointer",
-  },
-  container: {
-    maxWidth: "1000px",
-    margin: "0 auto",
-    padding: "40px",
-    fontFamily: "Segoe UI, sans-serif",
-    color: "#2c3e50",
-  },
-  heading: {
-    marginBottom: "30px",
-    fontSize: "32px",
-    textAlign: "center",
-    color: "#34495e",
-  },
-  card: {
-    background: "#fff",
-    padding: "20px 25px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-    marginBottom: "30px",
-  },
-  subCard: {
-    padding: "10px 15px",
-    margin: "10px 0",
-    background: "#f7f9fa",
-    borderRadius: "8px",
-    borderLeft: "4px solid #3498db",
-  },
-  kyc: (done) => ({
-    color: done ? "green" : "crimson",
-    fontWeight: "bold",
-  }),
 };
 
 export default DashboardPage;

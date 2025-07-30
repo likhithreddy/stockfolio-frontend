@@ -1,7 +1,17 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { API_ENDPOINTS } from "../config/api";
+
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const fieldVariants = {
+  focus: { scale: 1.02, borderColor: "#2575fc" },
+};
 
 const AddMarketNewsForm = () => {
   const [form, setForm] = useState({
@@ -55,31 +65,45 @@ const AddMarketNewsForm = () => {
   };
 
   return (
-    <div style={{ maxWidth: "500px", margin: "auto" }}>
-      <h2>Add Market News</h2>
-      {["stock_id", "headline", "news_source", "impact_score"].map((field) => (
-        <div key={field}>
-          <label>{field.replace(/_/g, " ")}</label>
-          <input
-            type={
-              field === "impact_score" || field === "stock_id"
-                ? "number"
-                : "text"
-            }
-            name={field}
-            value={form[field]}
-            onChange={handleChange}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-          />
-        </div>
-      ))}
-      {error && (
-        <div style={{ color: "red", marginBottom: "10px" }}>{error}</div>
-      )}
-      <button onClick={submit} style={{ padding: "10px 20px" }}>
-        Submit
-      </button>
-    </div>
+    <motion.div
+      className="container mt-5" // Bootstrap container
+      variants={pageVariants}
+      initial="initial"
+      animate="animate"
+    >
+      <div className="card p-4 shadow-lg mx-auto" style={{ maxWidth: "500px" }}> {/* Bootstrap card and centering */}
+        <h2 className="text-center mb-4">Add Market News</h2>
+        {["stock_id", "headline", "news_source", "impact_score"].map((field) => (
+          <div className="mb-3" key={field}> {/* Bootstrap margin-bottom */}
+            <label className="form-label">{field.replace(/_/g, " ")}</label>
+            <motion.input
+              type={
+                field === "impact_score" || field === "stock_id"
+                  ? "number"
+                  : "text"
+              }
+              name={field}
+              value={form[field]}
+              onChange={handleChange}
+              className="form-control" // Bootstrap form control
+              whileFocus="focus"
+              variants={fieldVariants}
+            />
+          </div>
+        ))}
+        {error && (
+          <div className="alert alert-danger text-center">{error}</div> // Bootstrap alert for errors
+        )}
+        <motion.button
+          onClick={submit}
+          className="btn btn-primary w-100 mt-3" // Bootstrap button classes
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          Submit
+        </motion.button>
+      </div>
+    </motion.div>
   );
 };
 
