@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddMarketNewsForm = () => {
   const [form, setForm] = useState({
@@ -45,7 +46,7 @@ const AddMarketNewsForm = () => {
     }
 
     try {
-      await axios.post("http://localhost:8080/admin/add-market-news", form);
+      await axios.post(API_ENDPOINTS.ADMIN_ADD_MARKET_NEWS, form);
       alert("Market news added!");
       navigate("/admin");
     } catch (err) {

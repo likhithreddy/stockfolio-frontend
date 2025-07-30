@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const RegisterPage = () => {
   const [form, setForm] = useState({
@@ -24,7 +25,7 @@ const RegisterPage = () => {
     }
 
     try {
-      await axios.post("http://localhost:8080/register", form);
+      await axios.post(API_ENDPOINTS.REGISTER, form);
       alert("Registered successfully!");
       navigate("/");
     } catch (err) {

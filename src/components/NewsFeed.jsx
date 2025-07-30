@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const NewsFeed = ({ userId }) => {
   const [news, setNews] = useState([]);
@@ -7,7 +8,7 @@ const NewsFeed = ({ userId }) => {
   useEffect(() => {
     console.log("Fetching news for userId:", userId);
     const loadNews = async () => {
-      const res = await axios.get("http://localhost:8080/user/news", {
+      const res = await axios.get(API_ENDPOINTS.USER_NEWS, {
         params: { userId },
       });
       setNews(res.data);

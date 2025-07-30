@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddStockForm = () => {
   const navigate = useNavigate();
@@ -21,9 +22,9 @@ const AddStockForm = () => {
 
   const submit = async () => {
     try {
-      await axios.post("http://localhost:8080/admin/add-stock", form);
+      await axios.post(API_ENDPOINTS.ADMIN_ADD_STOCK, form);
       alert("Stock added successfully!");
-      navigate("http://localhost:8080/admin");
+      navigate("/admin");
     } catch (err) {
       alert("Error adding stock: " + err.response?.data?.error);
     }

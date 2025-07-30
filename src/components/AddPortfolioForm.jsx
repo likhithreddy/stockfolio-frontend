@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddPortfolioForm = ({ onAdded }) => {
   const user_id = localStorage.getItem("userId");
@@ -12,7 +13,7 @@ const AddPortfolioForm = ({ onAdded }) => {
       return;
     }
     try {
-      await axios.post("http://localhost:8080/portfolio", {
+      await axios.post(API_ENDPOINTS.PORTFOLIO, {
         user_id,
         portfolio_name,
       });

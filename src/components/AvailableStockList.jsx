@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const AvailableStockList = ({ onAdded }) => {
   const [stocks, setStocks] = useState([]);
@@ -7,7 +8,7 @@ const AvailableStockList = ({ onAdded }) => {
 
   useEffect(() => {
     const load = async () => {
-      const res = await axios.get("http://localhost:8080/stock/all");
+      const res = await axios.get(API_ENDPOINTS.STOCK_ALL);
       setStocks(res.data);
     };
     load();
@@ -15,7 +16,7 @@ const AvailableStockList = ({ onAdded }) => {
 
   const addToWatchlist = async (stock_id) => {
     try {
-      await axios.post("http://localhost:8080/watchlist/add", {
+      await axios.post(API_ENDPOINTS.WATCHLIST_ADD, {
         user_id,
         stock_id,
       });

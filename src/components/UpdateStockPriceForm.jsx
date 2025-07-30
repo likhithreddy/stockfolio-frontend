@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const UpdateStockPriceForm = () => {
   const [form, setForm] = useState({
@@ -63,10 +64,7 @@ const UpdateStockPriceForm = () => {
     }
 
     try {
-      await axios.post(
-        "http://localhost:8080/admin/update-price-history",
-        form
-      );
+      await axios.post(API_ENDPOINTS.ADMIN_UPDATE_PRICE_HISTORY, form);
       alert("Stock price history updated!");
       navigate("/admin");
     } catch (err) {

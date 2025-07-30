@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddGoalForm = ({ onGoalAdded }) => {
   const user_id = localStorage.getItem("userId");
@@ -15,7 +16,7 @@ const AddGoalForm = ({ onGoalAdded }) => {
     }
 
     try {
-      await axios.post("http://localhost:8080/goal", {
+      await axios.post(API_ENDPOINTS.GOAL, {
         user_id,
         goal_name,
         target_amount,

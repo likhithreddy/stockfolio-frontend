@@ -7,6 +7,7 @@ import TradeStockForm from "./TradeStockForm";
 import AvailableStockList from "./AvailableStockList";
 import AddPortfolioForm from "./AddPortfolioForm";
 import NewsFeed from "./NewsFeed";
+import { API_ENDPOINTS } from "../config/api";
 
 import axios from "axios";
 
@@ -16,7 +17,7 @@ const DashboardPage = () => {
 
   useEffect(() => {
     const loadDashboard = async () => {
-      const response = await axios.get("http://localhost:8080/user/dashboard", {
+      const response = await axios.get(API_ENDPOINTS.USER_DASHBOARD, {
         params: { userId },
       });
       setData(response.data);
@@ -85,13 +86,10 @@ const DashboardPage = () => {
                   style={styles.removeBtn}
                   onClick={async () => {
                     try {
-                      await axios.post(
-                        "http://localhost:8080/watchlist/remove",
-                        {
-                          user_id: userId,
-                          stock_id: stock.stock_id,
-                        }
-                      );
+                      await axios.post(API_ENDPOINTS.WATCHLIST_REMOVE, {
+                        user_id: userId,
+                        stock_id: stock.stock_id,
+                      });
                       window.location.reload();
                     } catch {
                       alert("Failed to remove");

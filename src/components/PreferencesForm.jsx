@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const PreferencesForm = ({ current, onUpdate }) => {
   const [preferred_sector, setSector] = useState(
@@ -15,7 +16,7 @@ const PreferencesForm = ({ current, onUpdate }) => {
 
   const save = async () => {
     try {
-      await axios.post("http://localhost:8080/preferences", {
+      await axios.post(API_ENDPOINTS.PREFERENCES, {
         user_id: localStorage.getItem("userId"),
         preferred_sector,
         preferred_risk_level,

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const AddExchangeForm = () => {
   const [form, setForm] = useState({
@@ -19,7 +20,7 @@ const AddExchangeForm = () => {
 
   const submit = async () => {
     try {
-      await axios.post("http://localhost:8080/admin/add-exchange", form);
+      await axios.post(API_ENDPOINTS.ADMIN_ADD_EXCHANGE, form);
       alert("Stock Exchange added!");
       navigate("/admin");
     } catch (err) {

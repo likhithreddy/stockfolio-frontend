@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const EditableGoalCard = ({ goal, onGoalUpdated }) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -15,7 +16,7 @@ const EditableGoalCard = ({ goal, onGoalUpdated }) => {
 
   const save = async () => {
     try {
-      await axios.post("http://localhost:8080/goal", {
+      await axios.post(API_ENDPOINTS.GOAL, {
         user_id: localStorage.getItem("userId"),
         ...form,
       });
@@ -30,7 +31,7 @@ const EditableGoalCard = ({ goal, onGoalUpdated }) => {
   const remove = async () => {
     if (!window.confirm("Are you sure you want to delete this goal?")) return;
     try {
-      await axios.delete(`http://localhost:8080/goal/${goal.goal_id}`);
+      await axios.delete(API_ENDPOINTS.GOAL_DELETE(goal.goal_id));
       onGoalUpdated();
     } catch {
       setMessage("Delete failed.");

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
 
 const TradeStockForm = ({ portfolios, stockId, symbol, onTrade }) => {
   const user_id = localStorage.getItem("userId");
@@ -17,7 +18,7 @@ const TradeStockForm = ({ portfolios, stockId, symbol, onTrade }) => {
 
   const submit = async () => {
     try {
-      await axios.post("http://localhost:8080/trade", {
+      await axios.post(API_ENDPOINTS.TRADE, {
         ...form,
         user_id,
         stock_id: stockId,

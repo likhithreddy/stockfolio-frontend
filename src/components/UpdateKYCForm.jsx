@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { API_ENDPOINTS } from "../config/api";
 
 const UpdateKYCForm = () => {
   const [userId, setUserId] = useState("");
@@ -9,7 +10,7 @@ const UpdateKYCForm = () => {
 
   const submit = async () => {
     try {
-      await axios.post("http://localhost:8080/admin/update-kyc", {
+      await axios.post(API_ENDPOINTS.ADMIN_UPDATE_KYC, {
         user_id: userId,
         is_kyc_done: kycDone,
       });
