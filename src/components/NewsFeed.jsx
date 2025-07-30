@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { motion } from "framer-motion";
 import { API_ENDPOINTS } from "../config/api";
-import { staggerContainer, fadeInUp } from "../animations/variants";
 
 const NewsFeed = ({ userId }) => {
   const [news, setNews] = useState([]);
@@ -18,37 +16,45 @@ const NewsFeed = ({ userId }) => {
   }, [userId]);
 
   return (
-    <motion.div
-      className="card p-4 mb-4 shadow-sm" // Bootstrap card classes
-      variants={staggerContainer}
-      initial="hidden"
-      animate="visible"
-    >
-      <h2 className="card-title mb-3">Market News</h2> {/* Bootstrap card title and margin-bottom */}
+    <div style={styles.card}>
+      <h2>Market News</h2>
       {news.length ? (
-        <motion.ul className="list-group list-group-flush"> {/* Bootstrap list group */}
+        <ul>
           {news.map((n) => (
-            <motion.li
-              key={n.news_id}
-              className="list-group-item" // Bootstrap list group item
-              variants={fadeInUp}
-            >
+            <li key={n.news_id} style={styles.item}>
               <strong>{n.headline}</strong>
               <br />
-              <span className="text-muted"> {/* Bootstrap text-muted */}
-                {n.symbol} – {n.company_name}
+              <span style={styles.meta}>
+                {n.symbol} - {n.company_name}
                 <br />
                 {n.publication_date} | {n.news_source} | Impact:{" "}
                 {n.impact_score}%
               </span>
-            </motion.li>
+            </li>
           ))}
-        </motion.ul>
+        </ul>
       ) : (
-        <p className="text-muted">No news available.</p> // Bootstrap text-muted
+        <p>No news available.</p>
       )}
-    </motion.div>
+    </div>
   );
+};
+
+const styles = {
+  card: {
+    background: "#fff",
+    padding: "20px",
+    borderRadius: "10px",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+    marginBottom: "30px",
+  },
+  item: {
+    marginBottom: "15px",
+  },
+  meta: {
+    fontSize: "14px",
+    color: "#555",
+  },
 };
 
 export default NewsFeed;

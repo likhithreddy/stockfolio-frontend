@@ -1,83 +1,399 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion"; // Removed useScroll, useTransform
-
-const pageVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0, transition: { duration: 0.5, staggerChildren: 0.1 } },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
-};
-
-const buttonVariants = {
-  initial: { opacity: 0, y: 20 },
-  animate: { opacity: 1, y: 0 },
-  hover: { scale: 1.05, backgroundColor: "#1a5bbd" }, // Darken on hover
-  tap: { scale: 0.95 },
-};
+import React, { useState, useEffect } from "react";
+import { Tabs, Tab, Table, Button, Container, Modal } from "react-bootstrap";
+import axios from "axios";
+import { API_ENDPOINTS } from "../config/api";
+import AddStockForm from "./forms/AddStockForm";
+import AddExchangeForm from "./forms/AddExchangeForm";
+import AddMarketNewsForm from "./forms/AddMarketNewsForm";
 
 const AdminPage = () => {
-  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState("kyc");
+  const [users, setUsers] = useState([]);
+  const [stocks, setStocks] = useState([]);
+  const [showAddStockModal, setShowAddStockModal] = useState(false);
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [selectedStock, setSelectedStock] = useState(null);
+  const [newPrice, setNewPrice] = useState("");
+  const [showAddExchangeModal, setShowAddExchangeModal] = useState(false);
+  const [stockExchanges, setStockExchanges] = useState([]);
+  const [showNewsModal, setShowNewsModal] = useState(false);
+  const [news, setNews] = useState([]);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.ADMIN_USERS);
+        setUsers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    };
+    fetchUsers();
+  }, [users]);
+
+  // Fetch stock data
+  useEffect(() => {
+    const fetchStocks = async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.ADMIN_STOCKS);
+        setStocks(response.data);
+      } catch (error) {
+        console.error("Failed to fetch stocks:", error);
+      }
+    };
+    fetchStocks();
+  }, [stocks]);
+
+  useEffect(() => {
+    const fetchStockExchanges = async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.ADMIN_STOCK_EXCHANGES);
+        setStockExchanges(response.data);
+      } catch (error) {
+        console.error("Failed to fetch stock exchanges:", error);
+      }
+    };
+    fetchStockExchanges();
+  }, [stockExchanges]);
+
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.ADMIN_NEWS_ALL);
+        setNews(response.data);
+      } catch (error) {
+        console.error("Failed to fetch news:", error);
+      }
+    };
+    fetchNews();
+  }, []);
+
+  const approveKYC = async (user_id) => {
+    try {
+      await axios.post(API_ENDPOINTS.ADMIN_APPROVE_KYC, { user_id });
+    } catch (error) {
+      console.error("Failed to approve KYC:", error);
+    }
+  };
+
+  const revokeKYC = async (user_id) => {
+    try {
+      await axios.post(API_ENDPOINTS.ADMIN_REVOKE_KYC, { user_id });
+    } catch (error) {
+      console.error("Failed to revoke KYC:", error);
+    }
+  };
 
   return (
-    <motion.div
-      className="container text-center mt-5" // Bootstrap classes
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-    >
-      <motion.h1 className="mb-4" variants={buttonVariants}>Admin Dashboard</motion.h1>
-      <motion.p className="lead mb-5" variants={buttonVariants}>Welcome, Admin! Choose an action:</motion.p>
+    <Container className="mt-4">
+      <h1 className="text-center mb-4">Admin Dashboard</h1>
+      <Tabs
+        activeKey={activeTab}
+        onSelect={(tab) => setActiveTab(tab)}
+        className="mb-3"
+      >
+        {/* KYC Tab */}
+        <Tab eventKey="kyc" title="KYC">
+          <h3>KYC Management</h3>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>KYC Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users.map((user) => (
+                <tr key={user.user_id}>
+                  <td>{user.user_id}</td>
+                  <td>
+                    {user.firstname} {user.lastname}
+                  </td>
+                  <td>{user.email}</td>
+                  <td>
+                    {user.is_kyc_done ? (
+                      <span style={{ color: "green" }}>Done</span>
+                    ) : (
+                      <span style={{ color: "red" }}>Pending</span>
+                    )}
+                  </td>
+                  <td>
+                    {user.is_kyc_done ? (
+                      <Button
+                        variant="danger"
+                        size="sm"
+                        onClick={() => revokeKYC(user.user_id)}
+                      >
+                        Revoke
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="success"
+                        size="sm"
+                        onClick={() => approveKYC(user.user_id)}
+                      >
+                        Approve
+                      </Button>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Tab>
 
-      <div className="d-grid gap-3 col-md-8 mx-auto"> {/* Bootstrap grid for buttons */}
-        <motion.button
-          onClick={() => navigate("/admin/add-stock")}
-          className="btn btn-primary btn-lg" // Bootstrap button classes
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
-          Add New Stock
-        </motion.button>
+        {/* Stock Exchanges Tab */}
+        <Tab eventKey="stock-exchanges" title="Stock Exchanges">
+          <h3>Manage Stock Exchanges</h3>
+          <Button
+            variant="primary"
+            onClick={() => setShowAddExchangeModal(true)}
+            className="mb-3"
+          >
+            Add Stock Exchange
+          </Button>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Country</th>
+                <th>Opening Time</th>
+                <th>Closing Time</th>
+                <th>Timezone</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stockExchanges.map((exchange) => (
+                <tr key={exchange.stock_exchange_id}>
+                  <td>{exchange.stock_exchange_id}</td>
+                  <td>{exchange.stock_exchange_name}</td>
+                  <td>{exchange.country}</td>
+                  <td>{exchange.opening_time}</td>
+                  <td>{exchange.closing_time}</td>
+                  <td>{exchange.timezone}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Tab>
 
-        <motion.button
-          onClick={() => navigate("/admin/add-exchange")}
-          className="btn btn-primary btn-lg"
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
-          Add Stock Exchange
-        </motion.button>
-        <motion.button
-          onClick={() => navigate("/admin/update-kyc")}
-          className="btn btn-primary btn-lg"
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
-          Update KYC Status
-        </motion.button>
-        <motion.button
-          onClick={() => navigate("/admin/update-price-history")}
-          className="btn btn-primary btn-lg"
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
-          Update Stock Price History
-        </motion.button>
-        <motion.button
-          onClick={() => navigate("/admin/add-market-news")}
-          className="btn btn-primary btn-lg"
-          variants={buttonVariants}
-          whileHover="hover"
-          whileTap="tap"
-        >
-          Add Market News
-        </motion.button>
-      </div>
-    </motion.div>
+        {/* Stocks Tab */}
+        <Tab eventKey="stocks" title="Stocks">
+          <h3>Manage Stocks</h3>
+          <Button
+            variant="primary"
+            className="mb-3"
+            onClick={() => setShowAddStockModal(true)}
+          >
+            Add New Stock
+          </Button>
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Stock ID</th>
+                <th>Symbol</th>
+                <th>Company Name</th>
+                <th>Current Price</th>
+                <th>Market Cap</th>
+                <th>Volatility</th>
+                <th>Exchange</th>
+                <th>Sector</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stocks.map((stock) => (
+                <tr key={stock.stock_id}>
+                  <td>{stock.stock_id}</td>
+                  <td>{stock.symbol}</td>
+                  <td>{stock.company_name}</td>
+                  <td>${stock.current_value.toFixed(2)}</td>
+                  <td>${stock.market_cap.toFixed(2)}</td>
+                  <td>{stock.volatility}</td>
+                  <td>{stock.exchange_name}</td>
+                  <td>{stock.sector}</td>
+                  <td>
+                    <Button
+                      variant="warning"
+                      size="sm"
+                      className="me-2"
+                      onClick={() => {
+                        setSelectedStock(stock);
+                        setNewPrice(stock.current_value); // preload with current
+                        setShowPriceModal(true);
+                      }}
+                    >
+                      Update Price
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Tab>
+
+        {/* Market News Tab */}
+        <Tab eventKey="market-news" title="Market News">
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3>Manage Market News</h3>
+            <Button variant="primary" onClick={() => setShowNewsModal(true)}>
+              Add Market News
+            </Button>
+          </div>
+
+          {news.length > 0 ? (
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Headline</th>
+                  <th>Stock</th>
+                  <th>Source</th>
+                  <th>Date</th>
+                  <th>Impact</th>
+                </tr>
+              </thead>
+              <tbody>
+                {news.map((n) => (
+                  <tr key={n.news_id}>
+                    <td>{n.headline}</td>
+                    <td>
+                      {n.symbol} – {n.company_name}
+                    </td>
+                    <td>{n.news_source}</td>
+                    <td>{n.publication_date}</td>
+                    <td>{n.impact_score}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          ) : (
+            <p>No market news available.</p>
+          )}
+        </Tab>
+      </Tabs>
+
+      {/* Add Stock Modal */}
+      <Modal
+        show={showAddStockModal}
+        onHide={() => setShowAddStockModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Add New Stock</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <AddStockForm
+            onClose={() => setShowAddStockModal(false)} // Close modal after submission
+            onStockAdded={() => {
+              setShowAddStockModal(false);
+              axios.get(API_ENDPOINTS.ADMIN_STOCKS).then((response) => {
+                setStocks(response.data);
+              });
+            }}
+          />
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={showPriceModal}
+        onHide={() => setShowPriceModal(false)}
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Update Stock Price</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>
+            <strong>{selectedStock?.symbol}</strong> –{" "}
+            {selectedStock?.company_name}
+          </p>
+          <input
+            type="number"
+            className="form-control mb-3"
+            value={newPrice}
+            onChange={(e) => setNewPrice(e.target.value)}
+          />
+          <Button
+            variant="primary"
+            onClick={async () => {
+              try {
+                await axios.post(API_ENDPOINTS.ADMIN_STOCKS_UPDATE_PRICE, {
+                  stock_id: selectedStock.stock_id,
+                  new_price: parseFloat(newPrice),
+                });
+                alert("Stock price updated successfully!");
+                setShowPriceModal(false);
+                // Refresh stocks
+                const response = await axios.get(API_ENDPOINTS.ADMIN_STOCKS);
+                setStocks(response.data);
+              } catch (err) {
+                alert(err.response?.data?.error || "Failed to update price.");
+              }
+            }}
+          >
+            Save
+          </Button>
+        </Modal.Body>
+      </Modal>
+
+      {/* Add Exchange Modal */}
+      <Modal
+        show={showAddExchangeModal}
+        onHide={() => setShowAddExchangeModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Add Stock Exchange</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <AddExchangeForm
+            onClose={() => setShowAddExchangeModal(false)}
+            onExchangeAdded={() => {
+              try {
+                axios
+                  .get(API_ENDPOINTS.ADMIN_STOCK_EXCHANGES)
+                  .then((response) => {
+                    setStockExchanges(response.data);
+                  });
+                setShowAddExchangeModal(false);
+                alert("Stock Exchange added successfully!");
+              } catch (error) {
+                console.error("Failed to refresh exchanges:", error);
+              }
+            }}
+          />
+        </Modal.Body>
+      </Modal>
+
+      <Modal
+        show={showNewsModal}
+        onHide={() => setShowNewsModal(false)}
+        size="lg"
+        centered
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Add Market News</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <AddMarketNewsForm
+            onClose={() => setShowNewsModal(false)}
+            onNewsAdded={() => {
+              alert("News added successfully!");
+              setShowNewsModal(false);
+              axios.get(API_ENDPOINTS.ADMIN_NEWS_ALL).then((res) => {
+                setNews(res.data);
+              });
+            }}
+          />
+        </Modal.Body>
+      </Modal>
+    </Container>
   );
 };
 
