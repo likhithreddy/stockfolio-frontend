@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, Container, Button, Modal, Table } from "react-bootstrap";
 import { API_ENDPOINTS } from "../config/api";
-import AddPortfolioForm from "./forms/AddPortfolioForm"; // Adjust the import path as needed
+import AddPortfolioForm from "./forms/AddPortfolioForm";
 
 const HoldingsPage = () => {
   const [data, setData] = useState(null);
