@@ -42,7 +42,6 @@ const App = () => {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/no-access" element={<NoAccessPage />} />
 
-        {/* Investor-only route */}
         <Route
           path="/dashboard"
           element={
@@ -51,7 +50,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Investor-only route */}
         <Route
           path="/holdings"
           element={
@@ -60,7 +58,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Investor-only route */}
         <Route
           path="/watchlist"
           element={
@@ -69,7 +66,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Investor-only route */}
         <Route
           path="/funds"
           element={
@@ -78,7 +74,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Investor-only route */}
         <Route
           path="/preferences"
           element={
@@ -87,7 +82,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Investor-only route */}
         <Route
           path="/goals"
           element={
@@ -96,7 +90,6 @@ const App = () => {
             </PrivateRoute>
           }
         />
-        {/* Admin-only routes */}
         <Route
           path="/admin"
           element={
