@@ -1,6 +1,6 @@
 [build]
   publish = "dist"
-  command = "rm -f package-lock.json && npm install && npm run build"
+  command = "rm -f package-lock.json && npm install react-bootstrap bootstrap&& npm run build"
 
 [build.environment]
   NODE_VERSION = "18"
